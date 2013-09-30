@@ -96,8 +96,6 @@ void USB_OTG_BSP_Init(USB_OTG_CORE_HANDLE *pdev)
 #ifndef USE_STM3210C_EVAL
   GPIO_InitTypeDef GPIO_InitStructure;
 #endif
-  EXTI_InitTypeDef EXTI_InitStructure;
-  NVIC_InitTypeDef NVIC_InitStructure;
 
 #ifdef USE_STM3210C_EVAL
 

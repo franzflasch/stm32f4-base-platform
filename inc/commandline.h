@@ -11,6 +11,9 @@
 #include <FreeRTOS.h>
 #include <FreeRTOS_CLI.h>
 
+#define cmdMAX_INPUT_SIZE 80
+#define configCOMMAND_INT_MAX_OUTPUT_SIZE 80
+
 /*
  * Commandline Task:
  */
