@@ -53,7 +53,7 @@ int main()
 	GPIO_Configuration();
 	USART_Configuration();
 	SPI_Configuration();
-	ADC_Triple_Interleaved_Configuration(&aADCTripleConvertedValue[0], ADC_BUFSIZE);
+	//ADC_Triple_Interleaved_Configuration(&aADCTripleConvertedValue[0], ADC_BUFSIZE);
 
 	/* Disable MMC/SD SPI CS Pin (active low) */
 	MMC_CS_HIGH();

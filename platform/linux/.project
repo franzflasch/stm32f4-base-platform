@@ -40,6 +40,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/inc</locationURI>
 		</link>
 		<link>
+			<name>linkerscript</name>
+			<type>2</type>
+			<locationURI>PARENT-2-PROJECT_LOC/linkerscript</locationURI>
+		</link>
+		<link>
 			<name>src</name>
 			<type>2</type>
 			<locationURI>PARENT-2-PROJECT_LOC/src</locationURI>

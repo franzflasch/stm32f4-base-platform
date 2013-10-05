@@ -117,16 +117,16 @@ void NVIC_Configuration(void)
 
 	/* Enable the USARTx Interrupt */
 	NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 8;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 15;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 
-	NVIC_InitStructure.NVIC_IRQChannel = ADC_IRQ_DMA_STREAM;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
+//	NVIC_InitStructure.NVIC_IRQChannel = ADC_IRQ_DMA_STREAM;
+//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
+//	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//	NVIC_Init(&NVIC_InitStructure);
 
 //	/* Configure the SPI interrupt priority */
 //	NVIC_InitStructure.NVIC_IRQChannel = SPI2_IRQn;
