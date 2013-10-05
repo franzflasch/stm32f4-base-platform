@@ -182,13 +182,12 @@ __ALIGN_BEGIN static uint8_t USBD_HID_CfgDesc[USB_HID_CONFIG_DESC_SIZ] __ALIGN_E
   0x01,         /*bNumEndpoints*/
   0x03,         /*bInterfaceClass: HID*/
   0x00,         /*bInterfaceSubClass : 1=BOOT, 0=no boot*/
-  0x00,         /*nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse*/
+  0x02,         /*nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse*/
   0,            /*iInterface: Index of string descriptor*/
   /******************** Descriptor of Joystick Mouse HID ********************/
   /* 18 */
   0x09,         /*bLength: HID Descriptor size*/
-  //HID_DESCRIPTOR_TYPE, /*bDescriptorType: HID*/
-  0x22,
+  HID_DESCRIPTOR_TYPE, /*bDescriptorType: HID*/
   0x11,         /*bcdHID: HID Class Spec release number*/
   0x01,
   0x00,         /*bCountryCode: Hardware target country*/
