@@ -24,7 +24,7 @@
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE  USB_OTG_dev __ALIGN_END;
 
 static void TestTask( void *pvParameters );
-static void BlinkyTask( void *pvParameters );
+static void UsbComTask( void *pvParameters );
 
 int main()
 {
@@ -41,7 +41,7 @@ int main()
 	usartControl.xUsartRxQueue = xQueueCreate( 1, sizeof( char * ) );
 
 	xTaskCreate( TestTask, ( signed char * ) "TestTask", configMINIMAL_STACK_SIZE, NULL, 3, NULL );
-	xTaskCreate( BlinkyTask, ( signed char * ) "BlinkyTask", configMINIMAL_STACK_SIZE, NULL, 3, NULL );
+	xTaskCreate( UsbComTask, ( signed char * ) "BlinkyTask", configMINIMAL_STACK_SIZE, NULL, 3, NULL );
 	xTaskCreate( prvUARTCommandConsoleTask, ( signed char * ) "CLI", configMINIMAL_STACK_SIZE, usartControl.xUsartRxQueue, 4, &usartControl.commandlineHandle );
 
 	/* Start the tasks and timer running. */
@@ -68,16 +68,29 @@ static void TestTask( void *pvParameters )
 
 
 
-static void BlinkyTask( void *pvParameters )
+static void UsbComTask( void *pvParameters )
 {
 	portTickType xNextWakeTime;
-	uint8_t testState = 0;
+	uint8_t i = 0;
+	uint8_t USB_connectState = 0;
 
-	static uint8_t testBuffer[3] =
+	/* Declaration of the receive buffer.
+	 * only the 2nd dimension will be declared via the HID_IN_PACKET define
+	 * because the first one involves further changes in the USB-device descriptor.
+	 * Maybe this can be automated later.
+	 * */
+	uint8_t USB_RxBufList[2][HID_OUT_PACKET];
+
+	static uint8_t testBuffer[HID_IN_PACKET] =
 	{
 			1,
 			2,
-			3
+			3,
+			4,
+			5,
+			6,
+			7,
+			8
 	};
 
 	USBD_Init(&USB_OTG_dev,
@@ -88,7 +101,8 @@ static void BlinkyTask( void *pvParameters )
 	#endif
 			&USR_desc,
 			&USBD_HID_cb,
-			&USR_cb);
+			&USR_cb,
+			&USB_RxBufList[0][0]);
 
 	xNextWakeTime = xTaskGetTickCount();
 	while(1)
@@ -96,19 +110,39 @@ static void BlinkyTask( void *pvParameters )
 		if(USBD_STATUS == 1)
 		{
 			/* We are connected send one status message*/
-			if(testState == 0)
+			if(USB_connectState == 0)
 			{
 				USART_debug(USART2, "Connected!\n\r");
-				testState = 1;
+				USB_connectState = 1;
 			}
-			DCD_EP_Tx(&USB_OTG_dev, 0x81, &testBuffer[0], 1);
+
+			/* Only update TX fifo if there is no other message pending */
+			if(!(USB_OTG_dev.usbUsrDevStatus & USB_USR_MSG_PENDING))
+			{
+				DCD_EP_Tx(&USB_OTG_dev, HID_IN_EP, &testBuffer[0], 8);
+			}
+			if((USB_OTG_dev.usbUsrDevStatus & USB_USR_RX_MSG_READY))
+			{
+				USART_debug(USART2, "RxMessage:");
+				for(i=0; i<HID_OUT_PACKET; i++)
+				{
+					USART_debug(USART2, "%d ", USB_RxBufList[0][i]);
+				}
+				for(i=0; i<HID_OUT_PACKET; i++)
+				{
+					USART_debug(USART2, "%d ", USB_RxBufList[1][i]);
+				}
+				/* Clear the MSG_READY flag */
+				USB_OTG_dev.usbUsrDevStatus &= ~USB_USR_RX_MSG_READY;
+				USART_debug(USART2, "\n\r");
+			}
 		}
 		else
 		{
-			if(testState == 1)
+			if(USB_connectState == 1)
 			{
 				USART_debug(USART2, "Disconnected!\n\r");
-				testState = 0;
+				USB_connectState = 0;
 			}
 		}
 		GPIOD->ODR ^= GREEN_LED;

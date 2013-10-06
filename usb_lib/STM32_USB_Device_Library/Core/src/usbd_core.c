@@ -135,7 +135,8 @@ void USBD_Init(USB_OTG_CORE_HANDLE *pdev,
                USB_OTG_CORE_ID_TypeDef coreID,
                USBD_DEVICE *pDevice,                  
                USBD_Class_cb_TypeDef *class_cb, 
-               USBD_Usr_cb_TypeDef *usr_cb)
+               USBD_Usr_cb_TypeDef *usr_cb,
+               uint8_t *rxBuf)
 {
   /* Hardware Init */
   USB_OTG_BSP_Init(pdev);  
@@ -155,6 +156,9 @@ void USBD_Init(USB_OTG_CORE_HANDLE *pdev,
   
   /* Enable Interrupts */
   USB_OTG_BSP_EnableInterrupt(pdev);
+
+  /* Set Receive buffer */
+  pdev->rxBuf = rxBuf;
 }
 
 /**

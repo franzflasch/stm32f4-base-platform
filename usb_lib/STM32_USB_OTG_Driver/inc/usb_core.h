@@ -76,6 +76,11 @@
   */ 
 
 
+/* FFL: usbUsrDevStatus defines: */
+#define USB_USR_MSG_PENDING 0x01
+#define USB_USR_RX_MSG_READY 0x02
+
+
 typedef enum {
   USB_OTG_OK = 0,
   USB_OTG_FAIL
@@ -300,6 +305,8 @@ typedef struct USB_OTG_handle
 #ifdef USE_DEVICE_MODE
   DCD_DEV     dev;
 #endif
+  uint8_t usbUsrDevStatus;		/* FFL: some useful infos about the dev status */
+  uint8_t *rxBuf;				/* FFL: pointer to the rxBuffer memory */
 #ifdef USE_HOST_MODE
   HCD_DEV     host;
 #endif

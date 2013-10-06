@@ -265,6 +265,9 @@ uint32_t  DCD_EP_Tx ( USB_OTG_CORE_HANDLE *pdev,
 {
   USB_OTG_EP *ep;
   
+  /* At first indicate that, we have a message pending */
+  pdev->usbUsrDevStatus |= 1;
+
   ep = &pdev->dev.in_ep[ep_addr & 0x7F];
   
   /* Setup and start the Transfer */
