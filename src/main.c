@@ -62,7 +62,6 @@ static void TestTask( void *pvParameters )
 		GPIOD->ODR ^= RED_LED;
 		vTaskDelayUntil( &xNextWakeTime, 50);
 	}
-
 }
 
 
@@ -72,14 +71,20 @@ static void UsbComTask( void *pvParameters )
 {
 	portTickType xNextWakeTime;
 	uint8_t i = 0;
+	uint8_t j = 0;
 	uint8_t USB_connectState = 0;
 
-	/* Declaration of the receive buffer.
-	 * only the 2nd dimension will be declared via the HID_IN_PACKET define
-	 * because the first one involves further changes in the USB-device descriptor.
-	 * Maybe this can be automated later.
+	/* USB user data
+	 * Important: Count must match with the USB HID descriptor settings!
+	 *  */
+	USB_UsrData usbRXTXData[HID_NR_EPS];
+
+	/* Initialize usrData struct
+	 * A dedicated function for that would be nice...
 	 * */
-	uint8_t USB_RxBufList[2][HID_OUT_PACKET];
+	memset(&usbRXTXData, 0, sizeof(usbRXTXData));
+	usbRXTXData[0].transferType = USB_USR_TRANSFER_TYPE_INTERRUPT;
+	usbRXTXData[1].transferType = USB_USR_TRANSFER_TYPE_BULK;
 
 	static uint8_t testBuffer[HID_IN_PACKET] =
 	{
@@ -102,7 +107,8 @@ static void UsbComTask( void *pvParameters )
 			&USR_desc,
 			&USBD_HID_cb,
 			&USR_cb,
-			&USB_RxBufList[0][0]);
+			&usbRXTXData[0],
+			HID_NR_EPS);
 
 	xNextWakeTime = xTaskGetTickCount();
 	while(1)
@@ -116,25 +122,27 @@ static void UsbComTask( void *pvParameters )
 				USB_connectState = 1;
 			}
 
+			/* Send message via EP1, requires complicated construct (HID_IN_EP&0x7F)-1 */
 			/* Only update TX fifo if there is no other message pending */
-			if(!(USB_OTG_dev.usbUsrDevStatus & USB_USR_MSG_PENDING))
+			if(!(USB_OTG_dev.usrData[(HID_IN_EP&0x7F)-1].usbUsrDevStatus & USB_USR_MSG_PENDING))
 			{
-				DCD_EP_Tx(&USB_OTG_dev, HID_IN_EP, &testBuffer[0], 8);
+				USART_debug(USART2, "TX Num: %d\n\r", (HID_IN_EP&0x7F)-1);
+				DCD_EP_Tx(&USB_OTG_dev, HID_IN_EP, &testBuffer[0], HID_IN_PACKET);
 			}
-			if((USB_OTG_dev.usbUsrDevStatus & USB_USR_RX_MSG_READY))
+
+			for(j=0; j<HID_NR_EPS; j++)
 			{
-				USART_debug(USART2, "RxMessage:");
-				for(i=0; i<HID_OUT_PACKET; i++)
+				if((USB_OTG_dev.usrData[j].usbUsrDevStatus & USB_USR_RX_MSG_READY))
 				{
-					USART_debug(USART2, "%d ", USB_RxBufList[0][i]);
+					USART_debug(USART2, "RxMessage Num: %d\n\r", j);
+					for(i=0; i<HID_OUT_PACKET; i++)
+					{
+						USART_debug(USART2, "%d ", USB_OTG_dev.usrData[j].rxBuf[i]);
+					}
+					/* Clear the MSG_READY flag */
+					USB_OTG_dev.usrData[j].usbUsrDevStatus &= ~USB_USR_RX_MSG_READY;
+					USART_debug(USART2, "\n\r");
 				}
-				for(i=0; i<HID_OUT_PACKET; i++)
-				{
-					USART_debug(USART2, "%d ", USB_RxBufList[1][i]);
-				}
-				/* Clear the MSG_READY flag */
-				USB_OTG_dev.usbUsrDevStatus &= ~USB_USR_RX_MSG_READY;
-				USART_debug(USART2, "\n\r");
 			}
 		}
 		else

@@ -56,6 +56,7 @@
 /** @defgroup USB_HID_Class_Layer_Parameter
   * @{
   */ 
+#define HID_NR_EPS					 2 /* Currently used number of EPs Caution: When changing this also the HID descriptor has to be adapted! */
 #define HID_IN_EP                    0x81
 #define HID_OUT_EP                   0x01
 #define HID_OUT_EP2                  0x02

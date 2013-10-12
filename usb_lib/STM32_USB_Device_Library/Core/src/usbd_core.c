@@ -136,7 +136,8 @@ void USBD_Init(USB_OTG_CORE_HANDLE *pdev,
                USBD_DEVICE *pDevice,                  
                USBD_Class_cb_TypeDef *class_cb, 
                USBD_Usr_cb_TypeDef *usr_cb,
-               uint8_t *rxBuf)
+               USB_UsrData *usbUsrData,
+               uint8_t numberUsrData)
 {
   /* Hardware Init */
   USB_OTG_BSP_Init(pdev);  
@@ -157,8 +158,9 @@ void USBD_Init(USB_OTG_CORE_HANDLE *pdev,
   /* Enable Interrupts */
   USB_OTG_BSP_EnableInterrupt(pdev);
 
-  /* Set Receive buffer */
-  pdev->rxBuf = rxBuf;
+  /* Set usr specifiv data */
+  pdev->usrData = usbUsrData;
+  pdev->nrUsrData = numberUsrData;
 }
 
 /**

@@ -335,13 +335,13 @@ static uint8_t  USBD_HID_Init (void  *pdev,
   // Prepare Out endpoint to receive next packet (CPU <-- PC)
   DCD_EP_PrepareRx(pdev,
               HID_OUT_EP,
-              &usbDev->rxBuf[0*HID_OUT_PACKET],
+              &usbDev->usrData[0].rxBuf[0],
               HID_OUT_PACKET);
 
   // Prepare Out endpoint to receive next packet (CPU <-- PC)
   DCD_EP_PrepareRx(pdev,
               HID_OUT_EP2,
-              &usbDev->rxBuf[1*HID_OUT_PACKET],
+              &usbDev->usrData[1].rxBuf[0],
               HID_OUT_PACKET);
 
   return USBD_OK;
@@ -499,7 +499,7 @@ static uint8_t  USBD_HID_DataIn (void  *pdev,
 	USB_OTG_CORE_HANDLE *usbDev = (USB_OTG_CORE_HANDLE *)pdev;
 
 	/* Reset the pending flag, now we can send a new message */
-	usbDev->usbUsrDevStatus &= ~(1 << 0);
+	usbDev->usrData[epnum-1].usbUsrDevStatus &= ~(1 << 0);
 	return USBD_OK;
 }
 
@@ -508,9 +508,9 @@ static uint8_t  USBD_HID_DataOut (void  *pdev,
 {
 	USB_OTG_CORE_HANDLE *usbDev = (USB_OTG_CORE_HANDLE *)pdev;
 
-	DCD_EP_PrepareRx(pdev, epnum, &usbDev->rxBuf[(epnum-1)*HID_OUT_PACKET], HID_OUT_PACKET);
+	DCD_EP_PrepareRx(pdev, epnum, &usbDev->usrData[epnum-1].rxBuf[0], HID_OUT_PACKET);
 
-	usbDev->usbUsrDevStatus |= USB_USR_RX_MSG_READY;
+	usbDev->usrData[epnum-1].usbUsrDevStatus |= USB_USR_RX_MSG_READY;
 
 	//USART_debug(USART2, "Rx: %d %d %d %d %d %d %d %d!\n\r", rxBuf[0], rxBuf[1], rxBuf[2], rxBuf[3], rxBuf[4], rxBuf[5], rxBuf[6],rxBuf[7]);
 	//USART_debug(USART2, "Rx2: %d %d %d %d %d %d %d %d!\n\r", rxBuf2[0], rxBuf2[1], rxBuf2[2], rxBuf2[3], rxBuf2[4], rxBuf2[5], rxBuf2[6],rxBuf2[7]);

@@ -93,7 +93,8 @@ void USBD_Init(USB_OTG_CORE_HANDLE *pdev,
                USBD_DEVICE *pDevice,                  
                USBD_Class_cb_TypeDef *class_cb, 
                USBD_Usr_cb_TypeDef *usr_cb,
-               uint8_t *rxBuf);
+               USB_UsrData *usbUsrData,
+               uint8_t numberUsrData);
 
 USBD_Status USBD_DeInit(USB_OTG_CORE_HANDLE *pdev);
 

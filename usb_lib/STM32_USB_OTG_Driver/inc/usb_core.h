@@ -31,6 +31,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usb_conf.h"
+#include "usbd_conf.h"
 #include "usb_regs.h"
 #include "usb_defines.h"
 
@@ -79,6 +80,9 @@
 /* FFL: usbUsrDevStatus defines: */
 #define USB_USR_MSG_PENDING 0x01
 #define USB_USR_RX_MSG_READY 0x02
+
+#define USB_USR_TRANSFER_TYPE_BULK 0x2
+#define USB_USR_TRANSFER_TYPE_INTERRUPT  0x3
 
 
 typedef enum {
@@ -298,6 +302,13 @@ typedef struct _OTG
 }
 OTG_DEV , *USB_OTG_USBO_PDEV;
 
+typedef struct _USB_UsrData_
+{
+	uint8_t transferType;			/* FFL: BULK, Interrupt, Isochronous */
+	uint8_t usbUsrDevStatus;		/* FFL: some useful infos about the dev status */
+	uint8_t rxBuf[HID_OUT_PACKET];	/* FFL: rxBuffer memory */
+}USB_UsrData;
+
 typedef struct USB_OTG_handle
 {
   USB_OTG_CORE_CFGS    cfg;
@@ -305,8 +316,8 @@ typedef struct USB_OTG_handle
 #ifdef USE_DEVICE_MODE
   DCD_DEV     dev;
 #endif
-  uint8_t usbUsrDevStatus;		/* FFL: some useful infos about the dev status */
-  uint8_t *rxBuf;				/* FFL: pointer to the rxBuffer memory */
+  uint8_t nrUsrData;		/* Number of usrData, number of EPs */
+  USB_UsrData *usrData;			/* Usr specific data struct */
 #ifdef USE_HOST_MODE
   HCD_DEV     host;
 #endif
