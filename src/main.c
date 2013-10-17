@@ -21,6 +21,8 @@
 #include <usbd_desc.h>
 #include <usbd_usr.h>
 
+#include <usbComShared.h>
+
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE  USB_OTG_dev __ALIGN_END;
 
 static void TestTask( void *pvParameters );
@@ -139,6 +141,12 @@ static void UsbComTask( void *pvParameters )
 					{
 						USART_debug(USART2, "%d ", USB_OTG_dev.usrData[j].rxBuf[i]);
 					}
+
+					/************** Map to the message struct ************************/
+					testUSBComMsg *test = (testUSBComMsg*)&USB_OTG_dev.usrData[1].rxBuf[0];
+					USART_debug(USART2, "\n%d %d\n", test->ctrlData, test->data);
+					/*****************************************************************/
+
 					/* Clear the MSG_READY flag */
 					USB_OTG_dev.usrData[j].usbUsrDevStatus &= ~USB_USR_RX_MSG_READY;
 					USART_debug(USART2, "\n\r");
