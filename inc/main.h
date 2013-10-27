@@ -14,6 +14,9 @@ typedef struct _usartCtrl_
 	xQueueHandle xUsartRxQueue;
 } usartCtrl;
 
+
+xTaskHandle adcTaskHandle;
+
 /*Global System Variables*/
 usartCtrl usartControl;
 

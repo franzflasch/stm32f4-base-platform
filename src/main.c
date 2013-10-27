@@ -23,9 +23,13 @@
 
 #include <usbComShared.h>
 
+#include <adc.h>
+#include <adc_lib.h>
+
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE  USB_OTG_dev __ALIGN_END;
 
 static void TestTask( void *pvParameters );
+static void ADCTask( void *pvParameters );
 static void UsbComTask( void *pvParameters );
 
 int main()
@@ -43,7 +47,8 @@ int main()
 	usartControl.xUsartRxQueue = xQueueCreate( 1, sizeof( char * ) );
 
 	xTaskCreate( TestTask, ( signed char * ) "TestTask", configMINIMAL_STACK_SIZE, NULL, 3, NULL );
-	xTaskCreate( UsbComTask, ( signed char * ) "BlinkyTask", configMINIMAL_STACK_SIZE, NULL, 3, NULL );
+	xTaskCreate( ADCTask, ( signed char * ) "ADCTask", configMINIMAL_STACK_SIZE, NULL, 3, &adcTaskHandle );
+	xTaskCreate( UsbComTask, ( signed char * ) "UsbComTask", configMINIMAL_STACK_SIZE, NULL, 3, NULL );
 	xTaskCreate( prvUARTCommandConsoleTask, ( signed char * ) "CLI", configMINIMAL_STACK_SIZE, usartControl.xUsartRxQueue, 4, &usartControl.commandlineHandle );
 
 	/* Start the tasks and timer running. */
@@ -67,6 +72,31 @@ static void TestTask( void *pvParameters )
 }
 
 
+static void ADCTask( void *pvParameters )
+{
+	uint16_t adcConvValue[ADC_BUF_SIZE];
+	adcWorkArea_t adcWa;
+
+	adcInit(&adcWa, &adcConvValue[0], ADC_BUF_SIZE, ADC_A_getSamplingRate());
+
+	/* Install the callback pointer */
+	ADC_A_installCB(adcCallback, adcTaskHandle);
+	ADC_A_dmaConfiguration(&adcConvValue[0], ADC_BUF_SIZE);
+
+	/* Start ADC Software Conversion */
+	ADC_SoftwareStartConv(ADC_A);
+
+	USART_debug(USART2, "ADC_SamplingRateHz: %d\n\r", ADC_A_getSamplingRate());
+
+	while(1)
+	{
+		GPIOD->ODR ^= ORANGE_LED;
+
+		/* The task will be suspended here
+		 * it will be resumed by the ADC callback */
+		vTaskSuspend( NULL );
+	}
+}
 
 
 static void UsbComTask( void *pvParameters )
