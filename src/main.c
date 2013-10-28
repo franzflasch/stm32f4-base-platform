@@ -26,6 +26,8 @@
 #include <adc.h>
 #include <adc_lib.h>
 
+uint16_t adcConvValue[ADC_BUF_SIZE];
+
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE  USB_OTG_dev __ALIGN_END;
 
 static void TestTask( void *pvParameters );
@@ -46,10 +48,10 @@ int main()
 
 	usartControl.xUsartRxQueue = xQueueCreate( 1, sizeof( char * ) );
 
-	xTaskCreate( TestTask, ( signed char * ) "TestTask", configMINIMAL_STACK_SIZE, NULL, 3, NULL );
-	xTaskCreate( ADCTask, ( signed char * ) "ADCTask", configMINIMAL_STACK_SIZE, NULL, 3, &adcTaskHandle );
-	xTaskCreate( UsbComTask, ( signed char * ) "UsbComTask", configMINIMAL_STACK_SIZE, NULL, 3, NULL );
-	xTaskCreate( prvUARTCommandConsoleTask, ( signed char * ) "CLI", configMINIMAL_STACK_SIZE, usartControl.xUsartRxQueue, 4, &usartControl.commandlineHandle );
+	xTaskCreate( TestTask, ( signed char * ) "TestTask", configMINIMAL_STACK_SIZE, NULL, 2, NULL );
+	xTaskCreate( ADCTask, ( signed char * ) "ADCTask", configMINIMAL_STACK_SIZE, NULL, 4, &adcTaskHandle );
+	xTaskCreate( UsbComTask, ( signed char * ) "UsbComTask", configMINIMAL_STACK_SIZE, NULL, 2, NULL );
+	xTaskCreate( prvUARTCommandConsoleTask, ( signed char * ) "CLI", configMINIMAL_STACK_SIZE, usartControl.xUsartRxQueue, 3, &usartControl.commandlineHandle );
 
 	/* Start the tasks and timer running. */
 	vTaskStartScheduler();
@@ -57,6 +59,7 @@ int main()
 	while(1);
 }
 
+adcWorkArea_t adcWa;
 
 static void TestTask( void *pvParameters )
 {
@@ -66,21 +69,19 @@ static void TestTask( void *pvParameters )
 	xNextWakeTime = xTaskGetTickCount();
 	while(1)
 	{
+		USART_debug(USART2, "bOv:%d %d %d\n\r", adcWa.bufOverWriteCnt, adcWa.frameCountAct, adcWa.frameCountIn);
 		GPIOD->ODR ^= RED_LED;
-		vTaskDelayUntil( &xNextWakeTime, 50);
+		vTaskDelayUntil( &xNextWakeTime, 150);
 	}
 }
 
 
 static void ADCTask( void *pvParameters )
 {
-	uint16_t adcConvValue[ADC_BUF_SIZE];
-	adcWorkArea_t adcWa;
-
-	adcInit(&adcWa, &adcConvValue[0], ADC_BUF_SIZE, ADC_A_getSamplingRate());
+	adcInit(&adcWa, &adcConvValue[0], ADC_BUF_SIZE, ADC_A_getSamplingRate(), adcTaskHandle);
 
 	/* Install the callback pointer */
-	ADC_A_installCB(adcCallback, adcTaskHandle);
+	ADC_A_installCB(adcCallback, &adcWa);
 	ADC_A_dmaConfiguration(&adcConvValue[0], ADC_BUF_SIZE);
 
 	/* Start ADC Software Conversion */

@@ -9,12 +9,14 @@
 #define ADC_H_
 
 /* IRQ Callback to be installed */
-typedef void (*ADC_call_back) (void *);
+typedef void (*ADC_call_back) (void *, void *);
 
 typedef struct ADC_WA_s
 {
 	ADC_call_back adcCallBack;	/* Cb to be installed */
 	void *adcCbParam;			/* Parameter which is handed to the callback functoin */
+	void *adcCbParam2;			/* 2nd Parameter which is handed to the callback functoin */
+	uint16_t frameCount;		/* Current frame count */
 }ADC_WA_t;
 
 void ADC_A_installCB(void *pCb, void *pCbParam);

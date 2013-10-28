@@ -24,6 +24,7 @@ void ADC_A_installCB(void *pCb, void *pCbParam)
 {
 	ADC_wa.adcCallBack = pCb;
 	ADC_wa.adcCbParam = pCbParam;
+	ADC_wa.adcCbParam2 = &ADC_wa.frameCount;
 }
 
 void ADC_A_dmaConfiguration(__IO uint16_t *uhADCxConvertedValue, uint16_t bufSize)
@@ -58,7 +59,7 @@ void ADC_A_dmaConfiguration(__IO uint16_t *uhADCxConvertedValue, uint16_t bufSiz
   DMA_Cmd(ADC_A_DMA_STREAMx, ENABLE);
 
   /* DMA-IRQ enable */
-  DMA_ITConfig(ADC_A_DMA_STREAMx, DMA_IT_TC, ENABLE);
+  DMA_ITConfig(ADC_A_DMA_STREAMx, DMA_IT_HT, ENABLE);
 
   /* Configure ADC3 Channel7 pin as analog input ******************************/
   GPIO_InitStructure.GPIO_Pin = ADC_A_GPIO_PIN;
@@ -120,10 +121,12 @@ uint32_t ADC_A_getSamplingRate(void)
 
 void ADC_A_DMA_Stream_IRQHandler(void)
 {
-	DMA_ClearITPendingBit( ADC_A_DMA_STREAMx, DMA_IT_TCIF0);
+	DMA_ClearITPendingBit( ADC_A_DMA_STREAMx, DMA_IT_HTIF0);
+
+	(*(uint16_t *)ADC_wa.adcCbParam2)++;
 
 	/* Call the CB function */
-	ADC_wa.adcCallBack(ADC_wa.adcCbParam);
+	ADC_wa.adcCallBack(ADC_wa.adcCbParam, ADC_wa.adcCbParam2);
 
 	GPIOD->ODR ^= BLUE_LED;
 }
