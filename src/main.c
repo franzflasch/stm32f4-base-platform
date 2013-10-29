@@ -26,7 +26,11 @@
 #include <adc.h>
 #include <adc_lib.h>
 
+#define ADC_BUF_SIZE 128
+#define ADC_BUF_SIZE_HOST ADC_BUF_SIZE*10
+
 uint16_t adcConvValue[ADC_BUF_SIZE];
+uint16_t adcBufferToHost[ADC_BUF_SIZE_HOST];
 
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE  USB_OTG_dev __ALIGN_END;
 
@@ -63,39 +67,86 @@ adcWorkArea_t adcWa;
 
 static void TestTask( void *pvParameters )
 {
-	portTickType xNextWakeTime;
+	int i = 0;
 
-
-	xNextWakeTime = xTaskGetTickCount();
 	while(1)
 	{
-		USART_debug(USART2, "bOv:%d %d %d\n\r", adcWa.bufOverWriteCnt, adcWa.frameCountAct, adcWa.frameCountIn);
 		GPIOD->ODR ^= RED_LED;
-		vTaskDelayUntil( &xNextWakeTime, 150);
+		vTaskDelay(1500);
 	}
 }
 
 
 static void ADCTask( void *pvParameters )
 {
-	adcInit(&adcWa, &adcConvValue[0], ADC_BUF_SIZE, ADC_A_getSamplingRate(), adcTaskHandle);
+	portTickType xNextWakeTime;
+	int i = 0;
+
+	adcInit(&adcWa,
+			&adcConvValue[0],
+			ADC_BUF_SIZE,
+			ADC_A_getSamplingRate(),
+			adcTaskHandle,
+			&adcBufferToHost[0],
+			ADC_BUF_SIZE_HOST);
 
 	/* Install the callback pointer */
-	ADC_A_installCB(adcCallback, &adcWa);
-	ADC_A_dmaConfiguration(&adcConvValue[0], ADC_BUF_SIZE);
+	//ADC_A_installCB(adcCallback, &adcWa);
+	//ADC_A_dmaConfiguration(&adcConvValue[0], ADC_BUF_SIZE);
 
 	/* Start ADC Software Conversion */
-	ADC_SoftwareStartConv(ADC_A);
+	//ADC_SoftwareStartConv(ADC_A);
 
 	USART_debug(USART2, "ADC_SamplingRateHz: %d\n\r", ADC_A_getSamplingRate());
 
+	xNextWakeTime = xTaskGetTickCount();
+
+	USART_debug(USART2, "Bufsize: %d\n\r", adcWa.bufSize);
+
+	for(i=0;i<40;i++)
+	{
+		USART_debug(USART2, "bOv:%d %d %d %d\n\r", adcWa.bufOverWriteCnt, adcWa.frameCountAct, adcWa.frameCountIn, adcWa.hostBufState);
+		adcWa.frameCountIn++;
+		adcDoProcessing(&adcWa);
+	}
+
+
+	for(i=0;i<ADC_BUF_SIZE_HOST;i++)
+	{
+		USART_debug(USART2, "%d ", adcBufferToHost[i]);
+		if(i%16 == 0)
+		{
+			USART_debug(USART2, "\n\r");
+		}
+	}
+
+	USART_debug(USART2, "Bufsize: %d\n\r", adcWa.bufSize);
+
+
+//	adcWa.frameCountIn++;
+//	adcDoProcessing(&adcWa);
+
 	while(1)
 	{
-		GPIOD->ODR ^= ORANGE_LED;
-
 		/* The task will be suspended here
 		 * it will be resumed by the ADC callback */
-		vTaskSuspend( NULL );
+		if(adcWa.hostBufState & ADC_HOST_BUF_OVF)
+		{
+			GPIOD->ODR ^= ORANGE_LED;
+			USART_debug(USART2, "bOv:%d %d %d %d\n\r", adcWa.bufOverWriteCnt, adcWa.frameCountAct, adcWa.frameCountIn, adcWa.hostBufState);
+			adcWa.hostBufState &= ~ADC_HOST_BUF_OVF;
+		}
+
+		if(adcWa.hostBufState & ADC_HOST_BUF_FIRST_HALF_READY)
+		{
+			adcWa.hostBufState &= ~ADC_HOST_BUF_FIRST_HALF_READY;
+		}
+		else if(adcWa.hostBufState & ADC_HOST_BUF_SCND_HALF_READY)
+		{
+			adcWa.hostBufState &= ~ADC_HOST_BUF_SCND_HALF_READY;
+		}
+
+		vTaskDelayUntil( &xNextWakeTime, 1);
 	}
 }
 

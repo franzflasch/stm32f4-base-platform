@@ -17,10 +17,13 @@ void adcCallback(void* pParam, void* pParam2)
 	pWa->frameCountIn = *(uint16_t *)pParam2;
 	/* Resume the FreeRTOS task */
 	//xTaskResumeFromISR(pWa->optionalParameter);
-	adcDoProcessing(pWa);
+	//adcDoProcessing(pWa);
 }
 
-void adcInit(adcWorkArea_t *pWa, uint16_t *pPingPongBuf, uint16_t bufSize, uint32_t samplingRate, void *pOptParameter)
+void adcInit(adcWorkArea_t *pWa, uint16_t *pPingPongBuf,
+			 uint16_t bufSize, uint32_t samplingRate,
+			 void *pOptParameter, uint16_t *hostBuf,
+			 uint16_t bufSizeHost)
 {
 	/* bufSize has to be at least 2 otherwise the pingPong is sensless*/
 	if(pPingPongBuf != NULL && bufSize >= 2)
@@ -34,12 +37,15 @@ void adcInit(adcWorkArea_t *pWa, uint16_t *pPingPongBuf, uint16_t bufSize, uint3
 		pWa->frameCountIn = 0;
 		pWa->frameCountAct = 0;
 		pWa->optionalParameter = pOptParameter;
+		pWa->bufSizeHost = bufSizeHost;
+		pWa->bufferToHost = hostBuf;
 	}
 }
 
 void adcDoProcessing(adcWorkArea_t *pWa)
 {
 	int i = 0;
+	static int hostBufCnt = 0;
 
 	if((pWa->frameCountIn%2) == 1)
 	{
@@ -54,6 +60,32 @@ void adcDoProcessing(adcWorkArea_t *pWa)
 	{
 		/*TODO Just for timing test, put here real code */
 		pWa->pActBuffer[i] = i;
+	}
+
+	/* Copy to host buffer */
+	memcpy(&pWa->bufferToHost[hostBufCnt],pWa->pActBuffer,2*(pWa->bufSize/2));
+	hostBufCnt += pWa->bufSize/2;
+
+
+	/* We didnt manage to store the last buffer */
+	if((pWa->hostBufState & ADC_HOST_BUF_FIRST_HALF_READY) ||
+	   (pWa->hostBufState & ADC_HOST_BUF_SCND_HALF_READY))
+	{
+		pWa->hostBufState |= ADC_HOST_BUF_OVF;
+	}
+
+	if(hostBufCnt==(pWa->bufSizeHost/2))
+	{
+		pWa->hostBufState |= ADC_HOST_BUF_FIRST_HALF_READY;
+	}
+	else if(hostBufCnt==pWa->bufSizeHost)
+	{
+		pWa->hostBufState |= ADC_HOST_BUF_SCND_HALF_READY;
+	}
+
+	if(hostBufCnt >= pWa->bufSizeHost)
+	{
+		hostBufCnt = 0;
 	}
 
 	if(pWa->frameCountIn-pWa->frameCountAct > 1)
