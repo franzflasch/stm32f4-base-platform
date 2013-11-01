@@ -26,9 +26,12 @@
 #include <adc.h>
 #include <adc_lib.h>
 
+#include <rfm12_lib.h>
+
 #define ADC_BUF_SIZE 128
 #define ADC_BUF_SIZE_HOST ADC_BUF_SIZE*10
 
+adcWorkArea_t adcWa;
 uint16_t adcConvValue[ADC_BUF_SIZE];
 uint16_t adcBufferToHost[ADC_BUF_SIZE_HOST];
 
@@ -53,7 +56,7 @@ int main()
 	usartControl.xUsartRxQueue = xQueueCreate( 1, sizeof( char * ) );
 
 	xTaskCreate( TestTask, ( signed char * ) "TestTask", configMINIMAL_STACK_SIZE, NULL, 2, NULL );
-	xTaskCreate( ADCTask, ( signed char * ) "ADCTask", configMINIMAL_STACK_SIZE, NULL, 4, &adcTaskHandle );
+	//xTaskCreate( ADCTask, ( signed char * ) "ADCTask", configMINIMAL_STACK_SIZE, NULL, 4, &adcTaskHandle );
 	xTaskCreate( UsbComTask, ( signed char * ) "UsbComTask", configMINIMAL_STACK_SIZE, NULL, 2, NULL );
 	xTaskCreate( prvUARTCommandConsoleTask, ( signed char * ) "CLI", configMINIMAL_STACK_SIZE, usartControl.xUsartRxQueue, 3, &usartControl.commandlineHandle );
 
@@ -63,14 +66,31 @@ int main()
 	while(1);
 }
 
-adcWorkArea_t adcWa;
+void receive(void)
+{	unsigned char test[32];
+	rf12_rxdata(test,32);
+	// daten verarbeiten
+}
+
+void send(void)
+{	unsigned char test[]="Dies ist ein 433MHz Test !!!\n   ";
+	rf12_txdata(test,32);
+}
 
 static void TestTask( void *pvParameters )
 {
 	int i = 0;
 
+	RFM12_init();
+	rf12_setfreq(RF12FREQ(433.92));	// Sende/Empfangsfrequenz auf 433,92MHz einstellen
+	rf12_setbandwidth(4, 1, 4);		// 200kHz Bandbreite, -6dB Verstärkung, DRSSI threshold: -79dBm
+	rf12_setbaud(19200);			// 19200 baud
+	rf12_setpower(0, 6);			// 1mW Ausgangangsleistung, 120kHz Frequenzshift
+
 	while(1)
 	{
+		send();
+
 		GPIOD->ODR ^= RED_LED;
 		vTaskDelay(1500);
 	}

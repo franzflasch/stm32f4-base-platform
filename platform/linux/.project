@@ -50,6 +50,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/linkerscript</locationURI>
 		</link>
 		<link>
+			<name>rfm12_lib</name>
+			<type>2</type>
+			<locationURI>PARENT-2-PROJECT_LOC/rfm12_lib</locationURI>
+		</link>
+		<link>
 			<name>src</name>
 			<type>2</type>
 			<locationURI>PARENT-2-PROJECT_LOC/src</locationURI>
