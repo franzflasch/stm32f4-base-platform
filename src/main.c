@@ -80,16 +80,25 @@ void send(void)
 static void TestTask( void *pvParameters )
 {
 	int i = 0;
+	uint16_t data = 33;
+	unsigned char txdata = 33;
 
-	RFM12_init();
-	rf12_setfreq(RF12FREQ(433.92));	// Sende/Empfangsfrequenz auf 433,92MHz einstellen
-	rf12_setbandwidth(4, 1, 4);		// 200kHz Bandbreite, -6dB Verstärkung, DRSSI threshold: -79dBm
-	rf12_setbaud(19200);			// 19200 baud
-	rf12_setpower(0, 6);			// 1mW Ausgangangsleistung, 120kHz Frequenzshift
+	RFM12_CS_HIGH();
+
+	Delay(100);
+
+	RFM12_init_tx();
+//	rf12_setfreq(RF12FREQ(433.92));	// Sende/Empfangsfrequenz auf 433,92MHz einstellen
+//	rf12_setbandwidth(4, 1, 4);		// 200kHz Bandbreite, -6dB Verstärkung, DRSSI threshold: -79dBm
+//	rf12_setbaud(19200);			// 19200 baud
+//	rf12_setpower(0, 6);			// 1mW Ausgangangsleistung, 120kHz Frequenzshift
 
 	while(1)
 	{
-		send();
+		//rf12_rxdata(&data,1);
+		//send();
+		rf12_txdata(&txdata, 1);
+		USART_debug(USART2, "%u\n\r", data);
 
 		GPIOD->ODR ^= RED_LED;
 		vTaskDelay(1500);
