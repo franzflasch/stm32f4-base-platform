@@ -35,16 +35,16 @@
 #define ADC_A_DMA_Stream_IRQHandler	DMA2_Stream0_IRQHandler
 
 
-#define SPI1_GPIO_PORT		GPIOA
-#define SPI1_SCK_PIN		GPIO_Pin_5
-#define SPI1_MISO_PIN		GPIO_Pin_6
-#define SPI1_MOSI_PIN		GPIO_Pin_7
-#define SPI1_SCK_PIN_SRC	GPIO_PinSource5
-#define SPI1_MISO_PIN_SRC	GPIO_PinSource6
-#define SPI1_MOSI_PIN_SRC	GPIO_PinSource7
+#define SPI2_GPIO_PORT		GPIOB
+#define SPI2_SCK_PIN		GPIO_Pin_13
+#define SPI2_MISO_PIN		GPIO_Pin_14
+#define SPI2_MOSI_PIN		GPIO_Pin_15
+#define SPI2_SCK_PIN_SRC	GPIO_PinSource13
+#define SPI2_MISO_PIN_SRC	GPIO_PinSource14
+#define SPI2_MOSI_PIN_SRC	GPIO_PinSource15
 
 
-#define RFM12_SPI			SPI1
+#define RFM12_SPI			SPI2
 #define RFM12_NSEL_PORT		GPIOC
 #define RFM12_NSEL_PIN		GPIO_Pin_4
 #define RFM12_CS_LOW()		GPIO_ResetBits(RFM12_NSEL_PORT, RFM12_NSEL_PIN)

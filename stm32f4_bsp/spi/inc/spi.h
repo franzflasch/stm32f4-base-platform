@@ -9,7 +9,7 @@
 #define RFM12_H_
 
 
-void SPI1_init(void);
+void SPI2_init(void);
 
 
 #endif /* RFM12_H_ */
