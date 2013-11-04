@@ -11,26 +11,9 @@
 
 void SPI2_init(void)
 {
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
-
 	GPIO_InitTypeDef  GPIO_InitStructure;
 
-	/* Configure PA0 pin as input floating */
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_Init(GPIOB, &GPIO_InitStructure);
-
-	/* SPI GPIO Configuration --------------------------------------------------*/
-
-	/* CS */
-	GPIO_InitStructure.GPIO_Pin = RFM12_NSEL_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-	GPIO_Init(RFM12_NSEL_PORT, &GPIO_InitStructure);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
 
 	/* Connect SPI pins to AF5 */
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
@@ -38,9 +21,9 @@ void SPI2_init(void)
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;
 
-	GPIO_PinAFConfig(SPI2_GPIO_PORT, SPI2_SCK_PIN_SRC, GPIO_AF_SPI1);
-	GPIO_PinAFConfig(SPI2_GPIO_PORT, SPI2_MISO_PIN_SRC, GPIO_AF_SPI1);
-	GPIO_PinAFConfig(SPI2_GPIO_PORT, SPI2_MOSI_PIN_SRC, GPIO_AF_SPI1);
+	GPIO_PinAFConfig(SPI2_GPIO_PORT, SPI2_SCK_PIN_SRC, GPIO_AF_SPI2);
+	GPIO_PinAFConfig(SPI2_GPIO_PORT, SPI2_MISO_PIN_SRC, GPIO_AF_SPI2);
+	GPIO_PinAFConfig(SPI2_GPIO_PORT, SPI2_MOSI_PIN_SRC, GPIO_AF_SPI2);
 
 	/* SPI SCK pin configuration */
 	GPIO_InitStructure.GPIO_Pin = SPI2_SCK_PIN;

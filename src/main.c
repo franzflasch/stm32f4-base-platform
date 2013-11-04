@@ -26,6 +26,7 @@
 #include <adc.h>
 #include <adc_lib.h>
 
+#include <spi.h>
 #include <rfm12_lib.h>
 
 #define ADC_BUF_SIZE 128
@@ -47,6 +48,7 @@ int main()
 	NVIC_Configuration();
 	GPIO_Configuration();
 	USART_Configuration();
+	SPI2_init();
 
 	FreeRTOS_CLIRegisterCommand( &xHelloCLI );
 	FreeRTOS_CLIRegisterCommand( &xSimpleParamCLI );
@@ -66,53 +68,32 @@ int main()
 	while(1);
 }
 
-
 void receive(void)
 {	unsigned char test[32];
-	rf12_rxdata(test,24);
+	RFM12_rxdata(test,19);
 	// daten verarbeiten
 	USART_debug(USART2, "%s\n\r", test);
 }
 
 void send(void)
-{	unsigned char test[]="Das hat lange gedauert!\n";
-	rf12_txdata(test,24);
+{	unsigned char test[]="Test RFM12 433MHz!\n";
+	RFM12_txdata(test,19);
 }
 
+#define RFM12_TX
 
-
-
-#define RF12_TX
-
-#ifdef RF12_TX
+#ifdef RFM12_TX
 static void TestTask( void *pvParameters )
 {
-	int i = 0;
-	uint8_t data[8] =
-	{
-			1,
-			2,
-			3,
-			4,
-			5,
-			6,
-			7,
-			8
-	};
-
 	USART_debug(USART2, "Start!\n\r");
-
-	SPI2_init();
-
-	RFM12_CS_HIGH();
 
 	vTaskDelay(15000);
 
-	rf12_init();					// ein paar Register setzen (z.B. CLK auf 10MHz)
-	rf12_setfreq(RF12FREQ(433.92));	// Sende/Empfangsfrequenz auf 433,92MHz einstellen
-	rf12_setbandwidth(4, 1, 4);		// 200kHz Bandbreite, -6dB Verstärkung, DRSSI threshold: -79dBm
-	rf12_setbaud(19200);			// 19200 baud
-	rf12_setpower(0, 6);			// 1mW Ausgangangsleistung, 120kHz Frequenzshift
+	RFM12_init();					// ein paar Register setzen (z.B. CLK auf 10MHz)
+	RFM12_setfreq(RFM12FREQ(433.92));	// Sende/Empfangsfrequenz auf 433,92MHz einstellen
+	RFM12_setbandwidth(4, 1, 4);		// 200kHz Bandbreite, -6dB Verstärkung, DRSSI threshold: -79dBm
+	RFM12_setbaud(19200);			// 19200 baud
+	RFM12_setpower(0, 6);			// 1mW Ausgangangsleistung, 120kHz Frequenzshift
 
 	while(1)
 	{
@@ -139,11 +120,11 @@ static void TestTask( void *pvParameters )
 
 	vTaskDelay(25000);
 
-	rf12_init();					// ein paar Register setzen (z.B. CLK auf 10MHz)
-	rf12_setfreq(RF12FREQ(433.92));	// Sende/Empfangsfrequenz auf 433,92MHz einstellen
-	rf12_setbandwidth(4, 1, 4);		// 200kHz Bandbreite, -6dB Verstärkung, DRSSI threshold: -79dBm
-	rf12_setbaud(19200);			// 19200 baud
-	rf12_setpower(0, 6);			// 1mW Ausgangangsleistung, 120kHz Frequenzshift
+	RFM12_init();					// ein paar Register setzen (z.B. CLK auf 10MHz)
+	RFM12_setfreq(RFM12FREQ(433.92));	// Sende/Empfangsfrequenz auf 433,92MHz einstellen
+	RFM12_setbandwidth(4, 1, 4);		// 200kHz Bandbreite, -6dB Verstärkung, DRSSI threshold: -79dBm
+	RFM12_setbaud(19200);			// 19200 baud
+	RFM12_setpower(0, 6);			// 1mW Ausgangangsleistung, 120kHz Frequenzshift
 
 
 	while(1)

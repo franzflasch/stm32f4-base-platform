@@ -34,7 +34,6 @@
 #define ADC_A_DR_ADDRESS     	  	((uint32_t)0x4001224C)
 #define ADC_A_DMA_Stream_IRQHandler	DMA2_Stream0_IRQHandler
 
-
 #define SPI2_GPIO_PORT		GPIOB
 #define SPI2_SCK_PIN		GPIO_Pin_13
 #define SPI2_MISO_PIN		GPIO_Pin_14
@@ -43,13 +42,13 @@
 #define SPI2_MISO_PIN_SRC	GPIO_PinSource14
 #define SPI2_MOSI_PIN_SRC	GPIO_PinSource15
 
-
-#define RFM12_SPI			SPI2
-#define RFM12_NSEL_PORT		GPIOC
-#define RFM12_NSEL_PIN		GPIO_Pin_4
-#define RFM12_CS_LOW()		GPIO_ResetBits(RFM12_NSEL_PORT, RFM12_NSEL_PIN)
-#define RFM12_CS_HIGH()		GPIO_SetBits(RFM12_NSEL_PORT, RFM12_NSEL_PIN)
-
+#define RFM12_SPI				SPI2
+#define RFM12_NSEL_PORT			GPIOC
+#define RFM12_NSEL_PIN			GPIO_Pin_4
+#define RFM12_CS_LOW()			GPIO_ResetBits(RFM12_NSEL_PORT, RFM12_NSEL_PIN)
+#define RFM12_CS_HIGH()			GPIO_SetBits(RFM12_NSEL_PORT, RFM12_NSEL_PIN)
+#define RFM12_SDO_CHECK_PORT 	GPIOB
+#define RFM12_SDO_CHECK_PIN 	GPIO_Pin_2
 
 void RCC_Configuration(void);
 void GPIO_Configuration(void);
