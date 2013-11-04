@@ -69,75 +69,65 @@ int main()
 }
 
 void receive(void)
-{	unsigned char test[32];
-	RFM12_rxdata(test,19);
+{
+	int i = 0;
+	unsigned char test[8];
+	RFM12_rxdata(test,8);
 	// daten verarbeiten
-	USART_debug(USART2, "%s\n\r", test);
+	for(i=0;i<8;i++)
+	{
+		USART_debug(USART2, "%d ", test[i]);
+	}
+	USART_debug(USART2, "\n\r");
 }
 
 void send(void)
-{	unsigned char test[]="Test RFM12 433MHz!\n";
-	RFM12_txdata(test,19);
+{
+	unsigned char test[8]=
+	{
+			1,
+			2,
+			3,
+			4,
+			5,
+			6,
+			7,
+			8
+	};
+	RFM12_txdata(test,8);
 }
 
 #define RFM12_TX
-
-#ifdef RFM12_TX
 static void TestTask( void *pvParameters )
 {
 	USART_debug(USART2, "Start!\n\r");
 
-	vTaskDelay(15000);
+	vTaskDelay(10000);
+	RFM12_reset();
+	vTaskDelay(10000);
 
 	RFM12_init();					// ein paar Register setzen (z.B. CLK auf 10MHz)
 	RFM12_setfreq(RFM12FREQ(433.92));	// Sende/Empfangsfrequenz auf 433,92MHz einstellen
 	RFM12_setbandwidth(4, 1, 4);		// 200kHz Bandbreite, -6dB Verstärkung, DRSSI threshold: -79dBm
 	RFM12_setbaud(19200);			// 19200 baud
 	RFM12_setpower(0, 6);			// 1mW Ausgangangsleistung, 120kHz Frequenzshift
-
-	while(1)
-	{
-		send();
-		//RFM_IRQ();
-		GPIOD->ODR ^= RED_LED;
-		vTaskDelay(1500);
-	}
-}
-
-
-
-#else
-static void TestTask( void *pvParameters )
-{
-	int i = 0;
-	uint16_t data = 00;
-
-	USART_debug(USART2, "Start!\n\r");
-
-	SPI2_init();
-
-	RFM12_CS_HIGH();
 
 	vTaskDelay(25000);
 
-	RFM12_init();					// ein paar Register setzen (z.B. CLK auf 10MHz)
-	RFM12_setfreq(RFM12FREQ(433.92));	// Sende/Empfangsfrequenz auf 433,92MHz einstellen
-	RFM12_setbandwidth(4, 1, 4);		// 200kHz Bandbreite, -6dB Verstärkung, DRSSI threshold: -79dBm
-	RFM12_setbaud(19200);			// 19200 baud
-	RFM12_setpower(0, 6);			// 1mW Ausgangangsleistung, 120kHz Frequenzshift
-
-
 	while(1)
 	{
+		#ifdef RFM12_TX
+		send();
+		#else
 		receive();
+		#endif
 
 		//USART_debug(USART2, "%s\n\r", RFM);
 
 		GPIOD->ODR ^= RED_LED;
-		vTaskDelay(1500);
+		vTaskDelay(150);
 	}
 }
-#endif
 
 static void ADCTask( void *pvParameters )
 {

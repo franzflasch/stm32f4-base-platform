@@ -38,27 +38,10 @@ uint16_t RFM12_trans(uint16_t value)
 	return retVal;
 }
 
-//unsigned short RFM12_trans(unsigned short wert)
-//{	unsigned short werti=0;
-//	unsigned char i;
-//
-//	cbi(RF_PORT, CS);
-//	for (i=0; i<16; i++)
-//	{	if (wert&32768)
-//			sbi(RF_PORT, SDI);
-//		else
-//			cbi(RF_PORT, SDI);
-//		werti<<=1;
-//		if (RF_PIN&(1<<SDO))
-//			werti|=1;
-//		sbi(RF_PORT, SCK);
-//		wert<<=1;
-//		_delay_us(0.3);
-//		cbi(RF_PORT, SCK);
-//	}
-//	sbi(RF_PORT, CS);
-//	return werti;
-//}
+void RFM12_reset(void)
+{
+	RFM12_trans(0xFE00);
+}
 
 void RFM12_init(void)
 {
@@ -147,10 +130,16 @@ void RFM12_txdata(unsigned char *data, unsigned char number)
 	RFM12_trans(0xB8D4);
 
 	for (i=0; i<number; i++)
-	{		RFM12_ready();
-		RFM12_trans(0xB800|(*data++));
+	{
+		RFM12_ready();
+		RFM12_trans(0xB800|(*data));
+		data++;
 	}
 
+	RFM12_ready();
+	RFM12_trans(0xB8AA);
+	RFM12_ready();
+	RFM12_trans(0xB8AA);
 	RFM12_ready();
 	RFM12_trans(0x8208);			// TX off
 }
@@ -164,8 +153,10 @@ void RFM12_rxdata(unsigned char *data, unsigned char number)
 	RFM12_trans(0xCA83);			// enable FIFO
 	//USART_debug(USART2, "%d\n\r", RFM12_trans(0x0000));
 	for (i=0; i<number; i++)
-	{	RFM12_ready();
-		*data++=RFM12_trans(0xB000);
+	{
+		RFM12_ready();
+		*data=RFM12_trans(0xB000);
+		data++;
 	}
 	RFM12_trans(0x8208);			// RX off
 }

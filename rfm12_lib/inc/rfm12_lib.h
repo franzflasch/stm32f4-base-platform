@@ -17,6 +17,7 @@
 
 uint16_t RFM12_trans(uint16_t value);
 
+void RFM12_reset(void);
 void RFM12_init(void);											// initialize module
 void RFM12_setfreq(unsigned short freq);							// set center frequency
 void RFM12_setbaud(unsigned short baud);							// set baudrate
