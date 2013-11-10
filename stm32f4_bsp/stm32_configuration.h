@@ -43,12 +43,14 @@
 #define SPI2_MOSI_PIN_SRC	GPIO_PinSource15
 
 #define RFM12_SPI				SPI2
-#define RFM12_NSEL_PORT			GPIOC
-#define RFM12_NSEL_PIN			GPIO_Pin_4
+#define RFM12_NSEL_PORT			GPIOB
+#define RFM12_NSEL_PIN			GPIO_Pin_11
 #define RFM12_CS_LOW()			GPIO_ResetBits(RFM12_NSEL_PORT, RFM12_NSEL_PIN)
 #define RFM12_CS_HIGH()			GPIO_SetBits(RFM12_NSEL_PORT, RFM12_NSEL_PIN)
 #define RFM12_SDO_CHECK_PORT 	GPIOB
-#define RFM12_SDO_CHECK_PIN 	GPIO_Pin_2
+#define RFM12_SDO_CHECK_PIN 	GPIO_Pin_12
+#define RFM12_VCC_PORT		 	GPIOE
+#define RFM12_VCC_PIN		 	GPIO_Pin_15
 
 void RCC_Configuration(void);
 void GPIO_Configuration(void);

@@ -25,6 +25,7 @@
 
 #include <adc.h>
 #include <adc_lib.h>
+#include <tim.h>
 
 #include <spi.h>
 #include <rfm12_lib.h>
@@ -42,31 +43,8 @@ static void TestTask( void *pvParameters );
 static void ADCTask( void *pvParameters );
 static void UsbComTask( void *pvParameters );
 
-int main()
-{
-	RCC_Configuration();
-	NVIC_Configuration();
-	GPIO_Configuration();
-	USART_Configuration();
-	SPI2_init();
+#define RFM12_TX
 
-	FreeRTOS_CLIRegisterCommand( &xHelloCLI );
-	FreeRTOS_CLIRegisterCommand( &xSimpleParamCLI );
-	FreeRTOS_CLIRegisterCommand( &xStoreInFlash );
-	FreeRTOS_CLIRegisterCommand( &xgetFromFlash );
-
-	usartControl.xUsartRxQueue = xQueueCreate( 1, sizeof( char * ) );
-
-	xTaskCreate( TestTask, ( signed char * ) "TestTask", configMINIMAL_STACK_SIZE, NULL, 2, NULL );
-	//xTaskCreate( ADCTask, ( signed char * ) "ADCTask", configMINIMAL_STACK_SIZE, NULL, 4, &adcTaskHandle );
-	//xTaskCreate( UsbComTask, ( signed char * ) "UsbComTask", configMINIMAL_STACK_SIZE, NULL, 2, NULL );
-	xTaskCreate( prvUARTCommandConsoleTask, ( signed char * ) "CLI", configMINIMAL_STACK_SIZE, usartControl.xUsartRxQueue, 3, &usartControl.commandlineHandle );
-
-	/* Start the tasks and timer running. */
-	vTaskStartScheduler();
-
-	while(1);
-}
 
 void receive(void)
 {
@@ -83,7 +61,7 @@ void receive(void)
 
 void send(void)
 {
-	unsigned char test[8]=
+unsigned char test[8]=
 	{
 			1,
 			2,
@@ -97,11 +75,48 @@ void send(void)
 	RFM12_txdata(test,8);
 }
 
-#define RFM12_TX
+void TIM2_IRQHandler(void)
+{
+	TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+	TIM_ClearFlag(TIM2,TIM_IT_Update);
+
+	GPIOD->ODR ^= RED_LED;
+}
+
+
+int main()
+{
+	RCC_Configuration();
+	NVIC_Configuration();
+	GPIO_Configuration();
+	USART_Configuration();
+	SPI2_init();
+	TIM2_Configuration();
+
+	FreeRTOS_CLIRegisterCommand( &xHelloCLI );
+	FreeRTOS_CLIRegisterCommand( &xSimpleParamCLI );
+	FreeRTOS_CLIRegisterCommand( &xStoreInFlash );
+	FreeRTOS_CLIRegisterCommand( &xgetFromFlash );
+
+	usartControl.xUsartRxQueue = xQueueCreate( 1, sizeof( char * ) );
+
+	xTaskCreate( TestTask, ( signed char * ) "TestTask", configMINIMAL_STACK_SIZE, NULL, 4, NULL );
+	//xTaskCreate( ADCTask, ( signed char * ) "ADCTask", configMINIMAL_STACK_SIZE, NULL, 4, &adcTaskHandle );
+	//xTaskCreate( UsbComTask, ( signed char * ) "UsbComTask", configMINIMAL_STACK_SIZE, NULL, 2, NULL );
+	xTaskCreate( prvUARTCommandConsoleTask, ( signed char * ) "CLI", configMINIMAL_STACK_SIZE, usartControl.xUsartRxQueue, 3, &usartControl.commandlineHandle );
+
+	/* Start the tasks and timer running. */
+	vTaskStartScheduler();
+
+	while(1);
+}
+
 static void TestTask( void *pvParameters )
 {
+	portTickType xNextWakeTime;
 	USART_debug(USART2, "Start!\n\r");
 
+	RFM12_on();
 	vTaskDelay(10000);
 	RFM12_reset();
 	vTaskDelay(10000);
@@ -112,8 +127,10 @@ static void TestTask( void *pvParameters )
 	RFM12_setbaud(19200);			// 19200 baud
 	RFM12_setpower(0, 6);			// 1mW Ausgangangsleistung, 120kHz Frequenzshift
 
-	vTaskDelay(25000);
+	vTaskDelay(15000);
 
+
+	xNextWakeTime = xTaskGetTickCount();
 	while(1)
 	{
 		#ifdef RFM12_TX
@@ -125,7 +142,7 @@ static void TestTask( void *pvParameters )
 		//USART_debug(USART2, "%s\n\r", RFM);
 
 		GPIOD->ODR ^= RED_LED;
-		vTaskDelay(150);
+		vTaskDelayUntil( &xNextWakeTime, 10000);
 	}
 }
 

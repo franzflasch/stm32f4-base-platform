@@ -10,13 +10,14 @@
 #ifndef RFM12_LIB_H_
 #define RFM12_LIB_H_
 
-#define RFM12_WAIT_SDO_HIGH() while(GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_2)!=1)
+#define RFM12_WAIT_SDO_HIGH() while(GPIO_ReadInputDataBit(RFM12_SDO_CHECK_PORT, RFM12_SDO_CHECK_PIN)!=1)
 
 /* macro for calculating frequency value out of frequency in MHz */
 #define RFM12FREQ(freq)	((freq-430.0)/0.0025)
 
 uint16_t RFM12_trans(uint16_t value);
 
+void RFM12_on(void);
 void RFM12_reset(void);
 void RFM12_init(void);											// initialize module
 void RFM12_setfreq(unsigned short freq);							// set center frequency

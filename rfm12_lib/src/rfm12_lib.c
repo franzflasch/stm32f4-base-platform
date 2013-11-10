@@ -38,14 +38,19 @@ uint16_t RFM12_trans(uint16_t value)
 	return retVal;
 }
 
-void RFM12_reset(void)
-{
-	RFM12_trans(0xFE00);
-}
-
-void RFM12_init(void)
+void RFM12_on(void)
 {
 	GPIO_InitTypeDef  GPIO_InitStructure;
+
+	/* VCC */
+	GPIO_InitStructure.GPIO_Pin = RFM12_VCC_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_Init(RFM12_VCC_PORT, &GPIO_InitStructure);
+
+	GPIO_SetBits(RFM12_VCC_PORT, RFM12_VCC_PIN);
 
 	/* Configure PA0 pin as input floating */
 	GPIO_InitStructure.GPIO_Pin = RFM12_SDO_CHECK_PIN;
@@ -64,6 +69,15 @@ void RFM12_init(void)
 
 	RFM12_CS_HIGH();
 
+}
+
+void RFM12_reset(void)
+{
+	RFM12_trans(0xFE00);
+}
+
+void RFM12_init(void)
+{
 	/* Set up the RFM12 module */
 	RFM12_trans(0xC0E0);			// AVR CLK: 10MHz
 	RFM12_trans(0x80D7);			// Enable FIFO
@@ -108,9 +122,6 @@ void RFM12_ready(void)
 	//Delay(2);
 
 	RFM12_WAIT_SDO_HIGH();
-	//while(GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_2)!=1);
-	//cbi(RF_PORT, CS);
-	//while (!(RF_PIN&(1<<SDO))); // wait until FIFO ready
 }
 
 void RFM12_txdata(unsigned char *data, unsigned char number)
