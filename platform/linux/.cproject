@@ -23,8 +23,9 @@
 							<option id="org.eclipse.cdt.cross.arm.gnu.summon.linux.option.debugging.level.1928892573" name="Debug level" superClass="org.eclipse.cdt.cross.arm.gnu.summon.linux.option.debugging.level" value="org.eclipse.cdt.cross.arm.gnu.base.option.debugging.level.max" valueType="enumerated"/>
 							<option id="org.eclipse.cdt.cross.arm.gnu.summon.linux.option.target.fpu.abi.557896886" name="Float ABI" superClass="org.eclipse.cdt.cross.arm.gnu.summon.linux.option.target.fpu.abi" value="org.eclipse.cdt.cross.arm.gnu.base.option.target.fpu.abi.hard" valueType="enumerated"/>
 							<option id="org.eclipse.cdt.cross.arm.gnu.summon.linux.option.target.fpu.unit.1013466085" name="FPU Type" superClass="org.eclipse.cdt.cross.arm.gnu.summon.linux.option.target.fpu.unit" value="org.eclipse.cdt.cross.arm.gnu.base.option.target.fpu.unit.fpv4spd16" valueType="enumerated"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.summon.linux.option.target.processor.1151812719" superClass="org.eclipse.cdt.cross.arm.gnu.summon.linux.option.target.processor" value="org.eclipse.cdt.cross.arm.gnu.base.option.mcpu.cortex-m4" valueType="enumerated"/>
 							<targetPlatform id="org.eclipse.cdt.cross.arm.gnu.summon.linux.elf.platform.debug.76611661" isAbstract="false" name="Linux Platform" superClass="org.eclipse.cdt.cross.arm.gnu.summon.linux.elf.platform.debug"/>
-							<builder buildPath="${workspace_loc:/STM32F4_BasePlatform/Debug}" id="org.eclipse.cdt.cross.arm.gnu.summon.linux.elf.builder.debug.2135499318" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="ARM Summon Linux GNU Make builder" superClass="org.eclipse.cdt.cross.arm.gnu.summon.linux.elf.builder.debug"/>
+							<builder buildPath="${workspace_loc:/STM32F4_BasePlatform/Debug}" id="org.eclipse.cdt.cross.arm.gnu.summon.linux.elf.builder.debug.2135499318" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="ARM Linux GNU Make builder (Summon)" superClass="org.eclipse.cdt.cross.arm.gnu.summon.linux.elf.builder.debug"/>
 							<tool id="org.eclipse.cdt.cross.arm.gnu.summon.linux.elf.assembler.debug.1131226652" name="ARM Summon Linux GCC Assembler" superClass="org.eclipse.cdt.cross.arm.gnu.summon.linux.elf.assembler.debug">
 								<inputType id="org.eclipse.cdt.cross.arm.gnu.summon.linux.assembler.base.input.1022529114" superClass="org.eclipse.cdt.cross.arm.gnu.summon.linux.assembler.base.input"/>
 							</tool>
@@ -44,9 +45,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/FreeRTOS/FreeRTOS/Source/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/FreeRTOS/FreeRTOS/Source/portable/GCC/ARM_CM4F}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/FreeRTOS/FreeRTOS-Plus/Source/FreeRTOS-Plus-CLI}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/STM32F4_Lib/Libraries/CMSIS/Device/ST/STM32F4xx/Include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/STM32F4_Lib/Libraries/CMSIS/Include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/STM32F4_Lib/Libraries/STM32F4xx_StdPeriph_Driver/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Libraries/CMSIS/Device/ST/STM32F4xx/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Libraries/CMSIS/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Libraries/STM32F4xx_StdPeriph_Driver/inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/thirdparty/FAT_MMC}&quot;"/>
 								</option>
@@ -95,7 +96,7 @@
 						<toolChain id="org.eclipse.cdt.cross.arm.gnu.summon.linux.elf.toolchain.release.1461511521" name="ARM Linux GCC (Summon)" superClass="org.eclipse.cdt.cross.arm.gnu.summon.linux.elf.toolchain.release">
 							<option id="org.eclipse.cdt.cross.arm.gnu.summon.linux.option.debugging.level.1325118641" name="Debug level" superClass="org.eclipse.cdt.cross.arm.gnu.summon.linux.option.debugging.level" value="org.eclipse.cdt.cross.arm.gnu.base.option.debugging.level.none" valueType="enumerated"/>
 							<targetPlatform id="org.eclipse.cdt.cross.arm.gnu.summon.linux.elf.platform.release.320009233" isAbstract="false" name="Linux Platform" superClass="org.eclipse.cdt.cross.arm.gnu.summon.linux.elf.platform.release"/>
-							<builder buildPath="${workspace_loc:/STM32F4_BasePlatform/Release}" id="org.eclipse.cdt.cross.arm.gnu.summon.linux.elf.builder.release.1676552262" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="ARM Summon Linux GNU Make builder" superClass="org.eclipse.cdt.cross.arm.gnu.summon.linux.elf.builder.release"/>
+							<builder buildPath="${workspace_loc:/STM32F4_BasePlatform/Release}" id="org.eclipse.cdt.cross.arm.gnu.summon.linux.elf.builder.release.1676552262" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="ARM Linux GNU Make builder (Summon)" superClass="org.eclipse.cdt.cross.arm.gnu.summon.linux.elf.builder.release"/>
 							<tool id="org.eclipse.cdt.cross.arm.gnu.summon.linux.elf.assembler.release.187384998" name="ARM Summon Linux GCC Assembler" superClass="org.eclipse.cdt.cross.arm.gnu.summon.linux.elf.assembler.release">
 								<inputType id="org.eclipse.cdt.cross.arm.gnu.summon.linux.assembler.base.input.703180466" superClass="org.eclipse.cdt.cross.arm.gnu.summon.linux.assembler.base.input"/>
 							</tool>
